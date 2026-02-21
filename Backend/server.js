@@ -10,13 +10,19 @@ ConnectDB();
 
 const todoRouter = require('./route/todo');
 
-const PORT = 8081;
-
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const PORT = process.env.PORT || 8081;
 
 const app = express();
 
-app.use(cors({ origin: FRONTEND_URL }));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://assignment-no-08-rahul.netlify.app",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  })
+);
 
 app.use(express.json());
 
