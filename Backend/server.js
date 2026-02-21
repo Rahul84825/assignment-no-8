@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const cors = require('cors');
 
 const express = require('express');
 
@@ -11,7 +12,11 @@ const todoRouter = require('./route/todo');
 
 const PORT = 8081;
 
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+
 const app = express();
+
+app.use(cors({ origin: FRONTEND_URL }));
 
 app.use(express.json());
 
