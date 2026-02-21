@@ -1,26 +1,25 @@
-import React, { useState } from 'react'
+import { useState } from 'react';
 
-function Todoform() {
+function Todoform({ addTodo }) {
+  const [todo, setTodo] = useState('');
 
-  const [todo, setTodo] = useState("")
-  
-  const add = (e) => {
-    e.preventDefault()
+  const add = async (e) => {
+    e.preventDefault();
 
-    if(!todo.trim()) return
+    if (!todo.trim()) return;
 
-    addTodo({
+    await addTodo({
       todo,
-      completed: false
-    })
+      completed: false,
+    });
 
-    setTodo("")
-  }
+    setTodo('');
+  };
 
   return (
     <form onSubmit={add} className='flex'>
       <input
-        type="text"
+        type='text'
         placeholder='Write Todo...'
         className='w-full border border-black/10 rounded-l-lg px-3 outline-none duration-150 bg-white/20 py-1.5'
         value={todo}
@@ -30,7 +29,7 @@ function Todoform() {
         Add
       </button>
     </form>
-  )
+  );
 }
 
-export default Todoform
+export default Todoform;

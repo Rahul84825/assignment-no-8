@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react'
-import './App.css'
-import { TodoProvider } from './contexts/Todocontext'
-import Todoform from './components/Todoform'
-import TodoItem from './components/TodoItem'
+import { useEffect, useState } from 'react';
+import './App.css';
+import Todoform from './components/Todoform';
+import TodoItem from './components/TodoItem';
 import {
   fetchTodos,
   createTodo,
@@ -18,8 +17,7 @@ const normalizeTodos = (items = []) =>
   }));
 
 function App() {
-
-  const [todos, setTodos] = useState([])
+  const [todos, setTodos] = useState([]);
 
   const addTodo = async (todo) => {
     const task = todo?.todo?.trim();
@@ -98,13 +96,6 @@ function App() {
     };
   }, []);
 
-
-  // For the LocalStorage
-  
-  // useEffect(() => {
-  //   localStorage.setItem("todos", JSON.stringify(todos))
-  // }, [todos])
-
   return (
     <div className='bg-gradient-to-br from-[#172842] via-[#1a2a4a] to-[#0f1419] min-h-screen py-8'>
       <div className='w-full max-w-3xl mx-auto shadow-2xl rounded-2xl px-6 py-6 text-white bg-opacity-90 backdrop-blur-sm border border-gray-700'>
@@ -140,4 +131,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

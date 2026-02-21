@@ -1,75 +1,105 @@
 const todoModel = require('../model/todoModel');
 
-exports.getAllTodos = async(req, res) => {
-    const AllTodoTask = await todoModel.find();
-    
-    res.status(201).json({
-        message: "All Todo Task",
-        data: AllTodoTask,
-        success: true
-    });
-}
+exports.getAllTodos = async (req, res) => {
+  try {
+    const allTodoTask = await todoModel.find();
 
-exports.AddNewTodo = async(req, res) => {
-    const {data} = req.body;
-    
-    if(!data || Object.keys(data).length === 0){
-        res.status(401).json({
-            message: "There's no data present",
-            success: false
-        });
+    return res.status(200).json({
+      message: 'All Todo Task',
+      data: allTodoTask,
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Failed to fetch todo tasks',
+      success: false,
+    });
+  }
+};
+
+exports.AddNewTodo = async (req, res) => {
+  try {
+    const { data } = req.body;
+
+    if (!data || Object.keys(data).length === 0 || !data.task) {
+      return res.status(400).json({
+        message: "There's no valid data present",
+        success: false,
+      });
     }
 
     await todoModel.create(data);
 
-    const AllTodoTask = await todoModel.find();
+    const allTodoTask = await todoModel.find();
 
-    res.status(201).json({
-        message: "Todo Task Created Successfully",
-        data: AllTodoTask,
-        success: true
+    return res.status(201).json({
+      message: 'Todo Task Created Successfully',
+      data: allTodoTask,
+      success: true,
     });
-    
-}
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Failed to create todo task',
+      success: false,
+    });
+  }
+};
 
-exports.UpdateTodoById = async(req, res) => {
-    const {id} = req.params;
-    const {data} = req.body;
+exports.UpdateTodoById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { data } = req.body;
 
-    const todoTask = await todoModel.findOneAndUpdate(
-        {_id: id},
-        data,
-        {new: true}
-    )
-
-    if(!todoTask){
-        res.status(401).json({
-            message: `Todo Task not found for the ID: ${id}`,
-            success: false
-        });
+    if (!data || Object.keys(data).length === 0) {
+      return res.status(400).json({
+        message: 'No update data provided',
+        success: false,
+      });
     }
 
-    res.status(201).json({
-        message: "Updated Successfully",
-        data: todoTask,
-        success: true
-    });
-}
+    const todoTask = await todoModel.findOneAndUpdate({ _id: id }, data, { new: true });
 
-exports.DeleteTodoById = async(req, res) => {
-    const {id} = req.params;
+    if (!todoTask) {
+      return res.status(404).json({
+        message: `Todo Task not found for the ID: ${id}`,
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Updated Successfully',
+      data: todoTask,
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Failed to update todo task',
+      success: false,
+    });
+  }
+};
+
+exports.DeleteTodoById = async (req, res) => {
+  try {
+    const { id } = req.params;
     const todoTask = await todoModel.findByIdAndDelete(id);
 
-    if(!todoTask){
-        res.status(401).json({
-            message: `Todo Task not found for the ID: ${id}`,
-            success: false
-        });
+    if (!todoTask) {
+      return res.status(404).json({
+        message: `Todo Task not found for the ID: ${id}`,
+        success: false,
+      });
     }
 
-    res.status(201).json({
-        message: "Deleted Successfully",
-        data: todoTask,
-        success: true
+    return res.status(200).json({
+      message: 'Deleted Successfully',
+      data: todoTask,
+      success: true,
     });
-}
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Failed to delete todo task',
+      success: false,
+    });
+  }
+};
