@@ -87,6 +87,9 @@ A simple and clean Todo application built using React and Context API.
 - Tailwind CSS
 - Vite
 
+### Netlify link
+https://assignment-no-08-rahul.netlify.app/
+
 ## How to run
 ```bash
 npm install
