@@ -15,6 +15,7 @@ const normalizeTodos = (items = []) =>
     todo: item.task,
     completed: Boolean(item.completed),
   }));
+  
 
 function App() {
   const [todos, setTodos] = useState([]);
