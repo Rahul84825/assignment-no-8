@@ -1,0 +1,8 @@
+PUT http://localhost:8081/todo/699836976c7c0a198aba63e1
+Content-Type: application/json
+
+{
+  "data": {
+    "task": "Updated description for the task."
+  }
+}

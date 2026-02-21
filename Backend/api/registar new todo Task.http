@@ -1,0 +1,8 @@
+POST http://localhost:8081/todo
+Content-Type: application/json
+
+{
+    "data": {
+        "task": "This is a new task to be added to the todo list."
+    }
+}
