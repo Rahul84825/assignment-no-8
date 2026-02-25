@@ -4,6 +4,7 @@ import Todoform from './components/Todoform';
 import TodoItem from './components/TodoItem';
 import {
   fetchTodos,
+  searchTodos,
   createTodo,
   updateTodoById,
   deleteTodoById,
@@ -19,6 +20,27 @@ const normalizeTodos = (items = []) =>
 
 function App() {
   const [todos, setTodos] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredTodos, setFilteredTodos] = useState([]);
+
+  const handleSearch = async (query) => {
+    setSearchQuery(query);
+    
+    if (!query.trim()) {
+      // If search is empty, show all todos
+      setFilteredTodos(todos);
+    } else {
+      try {
+        // Call backend search API
+        console.log('Searching for:', query);
+        const results = await searchTodos(query);
+        console.log('Search results:', results);
+        setFilteredTodos(normalizeTodos(results));
+      } catch (error) {
+        console.error('Search failed:', error);
+      }
+    }
+  };
 
   const addTodo = async (todo) => {
     const task = todo?.todo?.trim();
@@ -26,7 +48,10 @@ function App() {
 
     try {
       const data = await createTodo(task);
-      setTodos(normalizeTodos(data));
+      const normalized = normalizeTodos(data);
+      setTodos(normalized);
+      setFilteredTodos(normalized);
+      setSearchQuery('');
     } catch (error) {
       console.error('Failed to add todo:', error);
     }
@@ -41,17 +66,26 @@ function App() {
 
       if (!updated) return;
 
-      setTodos((prev) =>
-        prev.map((prevTodo) =>
-          prevTodo.id === id
-            ? {
-                ...prevTodo,
-                todo: updated.task,
-                completed: Boolean(updated.completed),
-              }
-            : prevTodo
-        )
+      const updatedTodos = todos.map((prevTodo) =>
+        prevTodo.id === id
+          ? {
+              ...prevTodo,
+              todo: updated.task,
+              completed: Boolean(updated.completed),
+            }
+          : prevTodo
       );
+      
+      setTodos(updatedTodos);
+      
+      // Update filtered todos if search is active
+      if (searchQuery.trim()) {
+        setFilteredTodos(updatedTodos.filter((t) =>
+          t.todo.toLowerCase().includes(searchQuery.toLowerCase())
+        ));
+      } else {
+        setFilteredTodos(updatedTodos);
+      }
     } catch (error) {
       console.error('Failed to update todo:', error);
     }
@@ -60,7 +94,11 @@ function App() {
   const deleteTodo = async (id) => {
     try {
       await deleteTodoById(id);
-      setTodos((prev) => prev.filter((todo) => todo.id !== id));
+      const updated = todos.filter((todo) => todo.id !== id);
+      setTodos(updated);
+      setFilteredTodos(updated.filter((todo) =>
+        !searchQuery.trim() || todo.todo.toLowerCase().includes(searchQuery.toLowerCase())
+      ));
     } catch (error) {
       console.error('Failed to delete todo:', error);
     }
@@ -83,7 +121,9 @@ function App() {
       try {
         const data = await fetchTodos();
         if (isMounted) {
-          setTodos(normalizeTodos(data));
+          const normalized = normalizeTodos(data);
+          setTodos(normalized);
+          setFilteredTodos(normalized);
         }
       } catch (error) {
         console.error('Failed to load todos:', error);
@@ -106,13 +146,35 @@ function App() {
         <div className='mb-6'>
           <Todoform addTodo={addTodo} />
         </div>
+        <div className='mb-6'>
+          <div className='flex gap-2'>
+            <input
+              type='text'
+              placeholder='Search todos...'
+              className='w-full border border-black/10 rounded-l-lg px-3 outline-none duration-150 bg-white/20 py-2 text-white placeholder-gray-300'
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button 
+              onClick={() => handleSearch(searchQuery)}
+              className='rounded-r-lg px-4 py-2 bg-blue-600 text-white shrink-0 hover:bg-blue-700'
+            >
+              Search
+            </button>
+          </div>
+          {searchQuery && (
+            <p className='text-sm text-gray-400 mt-2'>
+              Found {filteredTodos.length} result{filteredTodos.length !== 1 ? 's' : ''}
+            </p>
+          )}
+        </div>
         <div className='flex flex-col gap-y-4'>
-          {todos.length === 0 ? (
+          {filteredTodos.length === 0 ? (
             <div className='text-center text-gray-400 py-8'>
-              <p className='text-lg'>No todos yet. Add one above.</p>
+              <p className='text-lg'>{searchQuery ? 'No todos found.' : 'No todos yet. Add one above.'}</p>
             </div>
           ) : (
-            todos.map((todo) => (
+            filteredTodos.map((todo) => (
               <div key={todo.id} className='w-full transform transition-all duration-300 hover:scale-105'>
                 <TodoItem
                   todo={todo}

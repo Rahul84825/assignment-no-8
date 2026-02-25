@@ -9,6 +9,13 @@ export const fetchTodos = async () => {
   return response.data?.data ?? [];
 };
 
+export const searchTodos = async (query) => {
+  const response = await apiClient.get('/todo/search', {
+    params: { query },
+  });
+  return response.data?.data ?? [];
+};
+
 export const createTodo = async (task) => {
   const response = await apiClient.post('/todo', {
     data: { task },

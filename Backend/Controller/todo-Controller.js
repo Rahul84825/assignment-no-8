@@ -103,3 +103,38 @@ exports.DeleteTodoById = async (req, res) => {
     });
   }
 };
+
+exports.searchTodos = async (req, res) => {
+  try {
+    const { query } = req.query;
+    console.log('Search query received:', query);
+
+    if (!query || query.trim() === '') {
+      const allTodoTask = await todoModel.find();
+      return res.status(200).json({
+        message: 'All Todo Task',
+        data: allTodoTask,
+        success: true,
+      });
+    }
+
+    // Case-insensitive search for task field
+    const searchResults = await todoModel.find({
+      task: { $regex: query, $options: 'i' }
+    });
+    
+    console.log('Found results:', searchResults.length);
+
+    return res.status(200).json({
+      message: 'Search Results',
+      data: searchResults,
+      success: true,
+    });
+  } catch (error) {
+    console.error('Search error:', error);
+    return res.status(500).json({
+      message: 'Failed to search todo tasks',
+      success: false,
+    });
+  }
+};
